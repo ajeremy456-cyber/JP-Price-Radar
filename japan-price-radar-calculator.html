@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本價差雷達 — 利潤試算</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12202B;
+    --panel: #182C3A;
+    --panel-2: #1E3444;
+    --hairline: #2C4658;
+    --ink: #E9E2D3;
+    --ink-dim: #9FB0BB;
+    --gold: #D3AE55;
+    --brick: #AE5A45;
+    --sage: #7FA98C;
+  }
+  *{ box-sizing: border-box; }
+  html,body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height:100vh;
+  }
+  body{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding: 56px 20px 80px;
+  }
+  .sheet{
+    width:100%;
+    max-width: 480px;
+  }
+  .masthead{
+    text-align:left;
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .masthead .jp{
+    font-family:'Noto Serif TC', serif;
+    font-weight:700;
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    margin:0;
+  }
+  .masthead .sub{
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .ledger{
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    overflow:hidden;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .row:last-child{ border-bottom:none; }
+  .row label{
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height:1.4;
+  }
+  .row label .unit{
+    display:block;
+    font-size: 11px;
+    color: #5F7688;
+    margin-top: 2px;
+  }
+  .row input{
+    width: 130px;
+    text-align: right;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--hairline);
+    color: var(--ink);
+    font-family: 'Noto Serif TC', serif;
+    font-size: 19px;
+    font-variant-numeric: tabular-nums;
+    padding: 4px 2px;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .row input:focus{
+    border-bottom-color: var(--gold);
+  }
+  .row input::-webkit-outer-spin-button,
+  .row input::-webkit-inner-spin-button{
+    -webkit-appearance:none; margin:0;
+  }
+
+  .divider{
+    padding: 10px 20px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: #5F7688;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .result{
+    background: var(--panel-2);
+    padding: 4px 0 2px;
+  }
+  .result .row label{ color: var(--ink); font-size: 14px; }
+  .result .row .value{
+    font-family:'Noto Serif TC', serif;
+    font-size: 19px;
+    font-variant-numeric: tabular-nums;
+  }
+  .result .row.headline{
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+  .result .row.headline label{
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .result .row.headline .value{
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .value.pos{ color: var(--sage); }
+  .value.neg{ color: var(--brick); }
+  .value.neutral{ color: var(--gold); }
+
+  .foot{
+    margin-top: 18px;
+    font-size: 12px;
+    color: #5F7688;
+    line-height: 1.6;
+    padding: 0 4px;
+  }
+
+  @media (max-width: 380px){
+    .row{ padding: 14px 16px; }
+    .row input{ width: 105px; font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="masthead">
+    <p class="jp">日本價差雷達</p>
+    <p class="sub">輸入日圓售價與台幣售價，試算利潤空間</p>
+  </div>
+
+  <div class="ledger">
+    <div class="row">
+      <label>日本售價<span class="unit">JPY・日圓</span></label>
+      <input type="number" id="jpyPrice" inputmode="decimal" placeholder="0" value="2980">
+    </div>
+    <div class="row">
+      <label>匯率<span class="unit">JPY → TWD，請依當日匯率調整</span></label>
+      <input type="number" id="rate" inputmode="decimal" step="0.001" value="0.215">
+    </div>
+    <div class="row">
+      <label>運費／關稅<span class="unit">TWD，可留 0</span></label>
+      <input type="number" id="shipping" inputmode="decimal" placeholder="0" value="0">
+    </div>
+    <div class="row">
+      <label>平台／金流手續費<span class="unit">% of 台灣售價，可留 0</span></label>
+      <input type="number" id="feePct" inputmode="decimal" step="0.1" placeholder="0" value="0">
+    </div>
+
+    <div class="divider">台灣端</div>
+
+    <div class="row">
+      <label>台灣預計售價<span class="unit">TWD</span></label>
+      <input type="number" id="twdPrice" inputmode="decimal" placeholder="0" value="800">
+    </div>
+
+    <div class="result">
+      <div class="row">
+        <label>換算成本</label>
+        <span class="value neutral" id="outCost">—</span>
+      </div>
+      <div class="row">
+        <label>手續費</label>
+        <span class="value neutral" id="outFee">—</span>
+      </div>
+      <div class="row headline">
+        <label>利潤</label>
+        <span class="value" id="outProfit">—</span>
+      </div>
+      <div class="row" style="padding-top:0; padding-bottom:20px;">
+        <label>利潤率</label>
+        <span class="value" id="outMargin">—</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">
+    換算成本 = 日本售價 × 匯率 + 運費／關稅　｜　利潤 = 台灣售價 − 換算成本 − 手續費　｜　利潤率 = 利潤 ÷ 台灣售價
+  </p>
+
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fields = ['jpyPrice','rate','shipping','feePct','twdPrice'];
+
+  function num(id){
+    const v = parseFloat($(id).value);
+    return isNaN(v) ? 0 : v;
+  }
+
+  function fmt(n){
+    return n.toLocaleString('zh-Hant-TW', { maximumFractionDigits: 1, minimumFractionDigits: 0 });
+  }
+
+  function calc(){
+    const jpy = num('jpyPrice');
+    const rate = num('rate');
+    const shipping = num('shipping');
+    const feePct = num('feePct');
+    const twd = num('twdPrice');
+
+    const cost = jpy * rate + shipping;
+    const fee = twd * (feePct / 100);
+    const profit = twd - cost - fee;
+    const margin = twd > 0 ? (profit / twd) * 100 : 0;
+
+    $('outCost').textContent = 'NT$ ' + fmt(cost);
+    $('outFee').textContent = 'NT$ ' + fmt(fee);
+
+    const profitEl = $('outProfit');
+    profitEl.textContent = (profit >= 0 ? 'NT$ ' : '-NT$ ') + fmt(Math.abs(profit));
+    profitEl.className = 'value ' + (profit > 0 ? 'pos' : profit < 0 ? 'neg' : 'neutral');
+
+    const marginEl = $('outMargin');
+    marginEl.textContent = margin.toFixed(1) + '%';
+    marginEl.className = 'value ' + (margin > 0 ? 'pos' : margin < 0 ? 'neg' : 'neutral');
+  }
+
+  fields.forEach(id => $(id).addEventListener('input', calc));
+  calc();
+</script>
+</body>
+</html>
