@@ -139,6 +139,25 @@
   .value.neg{ color: var(--brick); }
   .value.neutral{ color: var(--gold); }
 
+  .verdict{
+    text-align:center;
+    padding: 14px 20px;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border-top: 1px solid var(--hairline);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .verdict.buy{
+    background: rgba(127, 169, 140, 0.14);
+    color: var(--sage);
+  }
+  .verdict.skip{
+    background: rgba(174, 90, 69, 0.14);
+    color: var(--brick);
+  }
+
   .foot{
     margin-top: 18px;
     font-size: 12px;
@@ -204,6 +223,8 @@
         <span class="value" id="outMargin">—</span>
       </div>
     </div>
+
+    <div class="verdict" id="verdict">—</div>
   </div>
 
   <p class="foot">
@@ -247,6 +268,16 @@
     const marginEl = $('outMargin');
     marginEl.textContent = margin.toFixed(1) + '%';
     marginEl.className = 'value ' + (margin > 0 ? 'pos' : margin < 0 ? 'neg' : 'neutral');
+
+    const THRESHOLD = 20;
+    const verdictEl = $('verdict');
+    if (margin >= THRESHOLD) {
+      verdictEl.textContent = '值得買（利潤率 ≥ ' + THRESHOLD + '%）';
+      verdictEl.className = 'verdict buy';
+    } else {
+      verdictEl.textContent = '再考慮一下（利潤率 < ' + THRESHOLD + '%）';
+      verdictEl.className = 'verdict skip';
+    }
   }
 
   fields.forEach(id => $(id).addEventListener('input', calc));
